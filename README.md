@@ -1,11 +1,15 @@
 # YouLikeHits Bot - Userscript for YouLikeHits
 ## Features
 #### Website Section
-* Automatic clicks on links
-* closing of opened tabs if their points were awarded
-* automatic reloading in various cases e.g. all links were clicked, internal server error, etc.
+* automatic clicks on links
+* closing of opened tabs if their points were successfully awarded
+* automatic reloading in various cases e.g. all links were clicked, internal server error, link ran out of points etc.
 
-**Disclaimer: Usage of this inofficial script does eventually not violate the Terms of Service(T.O.S.) of *YouLikeHits.com*, but it may at any given time if the T.O.S. are updated. There is no liability or warranty for the functionality or security of this script. Use it at your own risk.**
+#### YouTube View Section
+* captcha solving (applicable to further sections)
+* automatic clicks on the "view" button
+
+**Disclaimer: Usage of this inofficial script does eventually not violate the Terms of Service(T.O.S.) of *YouLikeHits.com*, but it may at any given time if the T.O.S. are updated. There is neither any warranty for the functionality of this script nor any liability for a certain level of security. Use it at your own risk.**
 
 ## Installation
 1. Google Chrome: Install [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) or [Violentmonkey](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag).  
