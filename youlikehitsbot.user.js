@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
-// @version      0.2
+// @version      0.3
 // @description  Clicks links on the YLH website section automatically.
 // @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @downloadURL  https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
+// @match        *://*.youlikehits.com/login.php
 // @match        *://*.youlikehits.com/websites.php*
 // @match        *://*.youlikehits.com/viewwebsite.php*
 // @match        *://*.youlikehits.com/youtubenew2.php*
@@ -19,6 +20,26 @@
 (() => {
     J = jQuery.noConflict(true);
 
+    solveCaptcha = (imageEl, outputEl, captchaIdentifier, callback = () => {}) => { //apply this to youtube captchas as well!
+        if (window[captchaIdentifier] == undefined) {
+            window[captchaIdentifier] = true; //solving takes some time, so we'll lock a duplicate solver instance out
+            Tesseract.recognize(J(imageEl).attr("src")).then(equation => {
+                var formula = equation.text;
+                if (formula.length = 3) {//the exact length of the fomula
+                    if (formula.substr(1, 1) == 7) { //2-1 gets recognized as 271
+                        formula = formula.substr(0, 1) + "-" + formula.substr(2);
+                    }
+                    formula = formula.replace(/x/g, "*"); //x is just the human version of *
+                    formula = formula.replace(/[} ]/g, ""); //a random char being the result of misinterpretation; occasionally happening on the login form
+                    //console.log(formula); //re-enable this to debug how the captchasolving is doing so far
+                    outputEl.val(eval(formula));
+                    window[captchaIdentifier] = false; //not really necessary IF directly triggering a classic non-ajax post request
+                    callback()
+                }
+            });
+        }
+    }
+
     setInterval(() => {
         if (J("*:contains('503 Service Unavailable')").length) {
             console.log("Server Error! reloading...");
@@ -27,6 +48,13 @@
             alert("All websites were visited.");
         } else {
                 switch (document.location.pathname) {
+                    case "/login.php":
+                        captcha = J("img[alt='Enter The Numbers']");
+                        if (captcha.length) {
+                            captcha[0]
+                            solveCaptcha(captcha[0], J("input[name='postcaptcha']"), "ylh_login_captchasolving");
+                        }
+                        break;
                     case "/youtubenew2.php":
                         if (J('body:contains("failed")').length) alert("What exaxtly failed???");
                         if (J(".followbutton").length) { //if false, there is likely a captcha waiting to be solved
