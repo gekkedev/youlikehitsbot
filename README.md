@@ -9,6 +9,9 @@
 * captcha solving (applicable to further sections)
 * automatic clicks on the "view" button
 
+#### Login Form
+* captcha solving (no further automation planned here!)
+
 **Disclaimer: Usage of this inofficial script does eventually not violate the Terms of Service(T.O.S.) of *YouLikeHits.com*, but it may at any given time if the T.O.S. are updated. There is neither any warranty for the functionality of this script nor any liability for a certain level of security. Use it at your own risk.**
 
 ## Installation
