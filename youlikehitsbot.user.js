@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
-// @version      0.3
-// @description  Clicks links on the YLH website section automatically.
+// @version      0.3.1
+// @description  Interacts with YLH automatically whereever possible.
 // @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @downloadURL  https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
@@ -112,7 +112,8 @@
                             console.log("We ran out of buttons! requesting more...");
                             //GM.getValue("ylh_traffic_reloadlimit", false).then(rlimit => {
                             if (window.eval("typeof(window.childWindow) !== 'undefined'") && childWindow.closed) //without this we would not wait for the last link of the page to be visited successfully
-                                J("a[title='Refresh']")[0].click();
+                                location.reload();
+                            //J("a[title='Refresh']")[0].click();
                         }
                         break;
                     case "/viewwebsite.php":
@@ -123,7 +124,7 @@
                                     /*window.close(); //might not always work in FF
                                     setTimeout (window.close, 1000);*/
                                 });
-                            }
+                            } else if (J("*:contains('viewing websites too quickly!  Please wait')").length) location.reload();
                         } else alert("Please reload the website list, and make sure you are still logged in.");
                         break;
                 }
