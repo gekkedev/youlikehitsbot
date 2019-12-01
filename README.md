@@ -1,5 +1,6 @@
 # YouLikeHits Bot - Userscript for YouLikeHits
 ## Features
+**Just navigate to each of these sections (with one dedicated browser tab each) in order to launch the bot.**
 #### Website Section
 * automatic clicks on links
 * closing of opened tabs if their points were successfully awarded
@@ -11,6 +12,10 @@
 
 #### Login Form
 * captcha solving (no further automation planned here!)
+
+#### Daily Bonus Points Section
+* page refreshing until the claim button appears
+* claiming as soon as the button appears
 
 **Disclaimer: Usage of this inofficial script does eventually not violate the Terms of Service(T.O.S.) of *YouLikeHits.com*, but it may at any given time if the T.O.S. are updated. There is neither any warranty for the functionality of this script nor any liability for a certain level of security. Use it at your own risk.**
 
