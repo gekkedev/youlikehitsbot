@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
-// @version      0.4.0
+// @version      0.4.1
 // @description  Interacts with YLH automatically whereever possible.
 // @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
@@ -10,6 +10,7 @@
 // @match        *://*.youlikehits.com/websites.php*
 // @match        *://*.youlikehits.com/viewwebsite.php*
 // @match        *://*.youlikehits.com/youtubenew2.php*
+// @match        *://*.youlikehits.com/bonuspoints.php*
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
@@ -86,11 +87,17 @@
                         if (captcha.length)
                             solveCaptcha(captcha[0], J("input[name='postcaptcha']"), "ylh_login_captchasolving");
                         break;
+                    case "/bonuspoints.php":
+                        if (J("body:contains('You have made ')").length && J("body:contains(' Hits out of ')").length) {
+                            attachNotification(".maintable", "Not enough points. Reloading the website in 2 minutes to check again...");
+                            setTimeout(() => location.reload(), 1000 * 120);
+                        } else if (J(".buybutton").length) J(".buybutton")[0].click()
+                        break;
                     case "/youtubenew2.php":
                         if (J('body:contains("failed")').length) location.reload(); //captcha failed
                         if (J(".followbutton").length) { //if false, there is likely a captcha waiting to be solved
                             let vidID = () => { return J(".followbutton").first().parent().children("span[id*='count']").attr("id") };
-                            let patienceKiller = (prev) => { setTimeout( () => { if (vidID() == prev) J(".followbutton").parent().children("a:contains('Skip')").click(); }, 1000 * 60 * 3.5)};
+                            let patienceKiller = (prev) => { setTimeout( () => { if (vidID() == prev) { J(".followbutton").parent().children("a:contains('Skip')").click(); newWin.close(); }}, 1000 * 135)}; //max time: 120s + 15s grace time (max length: http://prntscr.com/q4o75o)
                             //console.log(previousVideo + " " + vidID() + (previousVideo != vidID() ? " true": " false"));
                             if (vidID() != previousVideo) { //has a new video has been provided yet? This will overcome slow network connections causing the same video to be played over and over
                                 previousVideo = vidID();
