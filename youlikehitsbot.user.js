@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
-// @version      0.3.1
+// @version      0.4.0
 // @description  Interacts with YLH automatically whereever possible.
 // @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
@@ -18,11 +18,13 @@
 // ==/UserScript==
 
 (() => {
-    J = jQuery.noConflict(true);
+    const J = jQuery.noConflict(true);
+    const globalInterval = 2000;
 
-    solveCaptcha = (imageEl, outputEl, captchaIdentifier, callback = () => {}) => { //apply this to youtube captchas as well!
+    solveCaptcha = (imageEl, outputEl, captchaIdentifier, callback = () => {}) => {
         if (window[captchaIdentifier] == undefined) {
             window[captchaIdentifier] = true; //solving takes some time, so we'll lock a duplicate solver instance out
+            let note = attachNotification(imageEl, "Please wait while your captcha is being solved. Don't worry if the code does not seem to match; that's because a new captcha image has been generated!");
             Tesseract.recognize(J(imageEl).attr("src")).then(equation => {
                 var formula = equation.text;
                 if (formula.length = 3) {//the exact length of the fomula
@@ -34,57 +36,80 @@
                     //console.log(formula); //re-enable this to debug how the captchasolving is doing so far
                     outputEl.val(eval(formula));
                     window[captchaIdentifier] = false; //not really necessary IF directly triggering a classic non-ajax post request
+                    removeNotification(note);
                     callback()
                 }
             });
         }
     }
 
+    attachNotification = (identifier, notification) => {
+        el = "<p style='color: red;'>" + notification + "</p>";
+        prevEl = J(identifier).prev()[0];
+        if (prevEl == undefined || prevEl.innerText != notification)
+           return J(el).insertBefore(identifier);
+    }
+
+    removeNotification = (el) => {
+        if (el != undefined)
+            el.remove()
+    }
+
+    alertOnce = (message, identifier) => {
+        localIdentifier = (identifier != undefined) ? identifier : message;
+        if (shownWarnings.indexOf(localIdentifier) == -1) {
+            shownWarnings.push(localIdentifier);
+            alert(message)
+        }
+    }
+
+    //runtime vars
+    let previousVideo = "";
+    /** indicates if a warning/message has already been shown. Happens once per window. Use alertOnce() */
+    let shownWarnings = [];
+
     setInterval(() => {
         if (J("*:contains('503 Service Unavailable')").length) {
             console.log("Server Error! reloading...");
             location.reload();
+        } else if (J("*:contains('not logged in!')").length) {
+            window.location.href = "login.php"
+        } else if (J("*:contains('Failed. You did not successfully solve the problem.')").length) {
+            J("a:contains('Try Again')")[0].click()
         } else if (J("*:contains('There are no Websites currently visitable for Points')").length) {
-            alert("All websites were visited.");
+            alertOnce("All websites were visited. Revisit/reload the page to start surfing again.");
         } else {
                 switch (document.location.pathname) {
                     case "/login.php":
+                        if (!J("#password").val().length) attachNotification("#username", "Consider storing your login data in your browser.")
                         captcha = J("img[alt='Enter The Numbers']");
-                        if (captcha.length) {
-                            captcha[0]
+                        if (captcha.length)
                             solveCaptcha(captcha[0], J("input[name='postcaptcha']"), "ylh_login_captchasolving");
-                        }
                         break;
                     case "/youtubenew2.php":
-                        if (J('body:contains("failed")').length) alert("What exaxtly failed???");
+                        if (J('body:contains("failed")').length) location.reload(); //captcha failed
                         if (J(".followbutton").length) { //if false, there is likely a captcha waiting to be solved
-                            if (window.eval("typeof(window.newWin) !== 'undefined'")) {
-                                if (newWin.closed) {
+                            let vidID = () => { return J(".followbutton").first().parent().children("span[id*='count']").attr("id") };
+                            let patienceKiller = (prev) => { setTimeout( () => { if (vidID() == prev) J(".followbutton").parent().children("a:contains('Skip')").click(); }, 1000 * 60 * 3.5)};
+                            //console.log(previousVideo + " " + vidID() + (previousVideo != vidID() ? " true": " false"));
+                            if (vidID() != previousVideo) { //has a new video has been provided yet? This will overcome slow network connections causing the same video to be played over and over
+                                previousVideo = vidID();
+                                if (window.eval("typeof(window.newWin) !== 'undefined'")) {
+                                    if (newWin.closed) {
+                                        console.log("Watching one Video!");
+                                        J(".followbutton")[0].click();
+                                        patienceKiller(previousVideo)
+                                    }
+                                } else {
                                     console.log("Watching one Video!");
-                                    J(".followbutton")[0].click()
+                                    J(".followbutton")[0].click();
+                                    patienceKiller(previousVideo)
                                 }
-                            } else {
-                                console.log("Watching one Video!");
-                                J(".followbutton")[0].click()
-                            }
+                            } //else do nothing and wait (until the video gets replaced or our patience thread tears)
                         } else {
-                            if (J("img[src*='captchayt']").length) {//captcha? no problemo, amigo.
-                                if (window["ylh_yt_traffic_captchasolving"] == undefined) {
-                                    window.ylh_yt_traffic_captchasolving = true; //solving takes some time, so we'll lock a duplicate solver instance out
-                                    Tesseract.recognize(J("img[src*='captchayt']").attr("src")).then(equation => {
-                                        var formula = equation.text;
-                                        if (formula.length = 3) {//the exact length of the fomula
-                                            if (formula.substr(1, 1) == 7) { //2-1 gets recognized as 271
-                                                formula = formula.substr(0, 1) + "-" + formula.substr(2);
-                                            }
-                                            formula = formula.replace("x", "*") //x is just the human version of *
-                                            J("input[name='answer']").val(eval(formula));
-                                            //ylh_yt_traffic_captchasolving = false; //likely not necessary. ajax or pure post?
-                                            J("input[value='Submit']").first().click();
-                                        }
-                                    });
-                                }
-                            }
+                            captcha = J("img[src*='captchayt']");
+                            if (captcha.length) //captcha? no problemo, amigo.
+                                solveCaptcha(captcha[0], J("input[name='answer']"), "ylh_yt_traffic_captchasolving", () => J("input[value='Submit']").first().click());
                         }
                         break;
                 }
@@ -130,5 +155,5 @@
                 }
             });
         }
-    }, 2000);
+    }, globalInterval);
 })();
