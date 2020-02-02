@@ -27,6 +27,13 @@ Opera: Install [this](https://addons.opera.com/en/extensions/details/install-chr
 
 By default, the script will automatically update every 24 hours (at least in Tampermonkey). If an updated version ever requires additional permissions, you will be asked to confirm this before the updated version gets installed.
 
+### Captcha Solving
+Just let it run, it should work nicely at all times. If not, you may still enter the captcha manually.  
+Before/while solving:  
+![](images/captcha1.png)  
+  
+After solving:  
+![](images/captcha2.png)
 
 ## Features to come in future
 * coverage of more sections
