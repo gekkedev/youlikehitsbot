@@ -77,8 +77,6 @@
             window.location.href = "login.php"
         } else if (J("*:contains('Failed. You did not successfully solve the problem.')").length) {
             J("a:contains('Try Again')")[0].click()
-        } else if (J("*:contains('There are no Websites currently visitable for Points')").length) {
-            alertOnce("All websites were visited. Revisit/reload the page to start surfing again.");
         } else {
                 switch (document.location.pathname) {
                     case "/login.php":
@@ -94,7 +92,7 @@
                         } else if (J(".buybutton").length) J(".buybutton")[0].click()
                         break;
                     case "/youtubenew2.php":
-                        if (J('body:contains("failed")').length) location.reload(); //captcha failed
+                        if (J('body:contains("failed")').length) location.reload(); //captcha failed?
                         if (J(".followbutton").length) { //if false, there is likely a captcha waiting to be solved
                             let vidID = () => { return J(".followbutton").first().parent().children("span[id*='count']").attr("id") };
                             let patienceKiller = (prev) => { setTimeout( () => { if (vidID() == prev) { J(".followbutton").parent().children("a:contains('Skip')").click(); newWin.close(); }}, 1000 * 135)}; //max time: 120s + 15s grace time (max length: http://prntscr.com/q4o75o)
@@ -123,29 +121,33 @@
             GM.getValue("ylh_traffic_tab_open", false).then(state => {
                 switch (document.location.pathname) {
                     case "/websites.php":
-                        if (!state && window.eval("typeof(window.childWindow) !== 'undefined'")) {
-                            if (!childWindow.closed)
-                                childWindow.close();
-                        } else if (state && window.eval("typeof(window.childWindow) == 'undefined'")) {
-                            console.log("no child window is actually open. let's create a new tab as if we came here for the very first time!");
-                            state = false;
-                        }
-                        var buttons = J(".followbutton:visible");
-                        if (buttons.length) {
-                            if (!state) {
-                                console.log("setting the tabstate to true...");
-                                GM.setValue('ylh_traffic_tab_open', true).then(() => {
-                                    console.log("Visiting a new page...");
-                                    buttons[0].onclick();
-                                });
-                            } else {
-                            }
+                        if (J("*:contains('There are no Websites currently visitable for Points')").length) {
+                            alertOnce("All websites were visited. Revisit/reload the page to start surfing again.")
                         } else {
-                            console.log("We ran out of buttons! requesting more...");
-                            //GM.getValue("ylh_traffic_reloadlimit", false).then(rlimit => {
-                            if (window.eval("typeof(window.childWindow) !== 'undefined'") && childWindow.closed) //without this we would not wait for the last link of the page to be visited successfully
-                                location.reload();
-                            //J("a[title='Refresh']")[0].click();
+                            if (!state && window.eval("typeof(window.childWindow) !== 'undefined'")) {
+                                if (!childWindow.closed)
+                                    childWindow.close();
+                            } else if (state && window.eval("typeof(window.childWindow) == 'undefined'")) {
+                                console.log("no child window is actually open. let's create a new tab as if we came here for the very first time!");
+                                state = false;
+                            }
+                            var buttons = J(".followbutton:visible");
+                            if (buttons.length) {
+                                if (!state) {
+                                    console.log("setting the tabstate to true...");
+                                    GM.setValue('ylh_traffic_tab_open', true).then(() => {
+                                        console.log("Visiting a new page...");
+                                        buttons[0].onclick();
+                                    });
+                                } else {
+                                }
+                            } else {
+                                console.log("We ran out of buttons! requesting more...");
+                                //GM.getValue("ylh_traffic_reloadlimit", false).then(rlimit => {
+                                if (window.eval("typeof(window.childWindow) !== 'undefined'") && childWindow.closed) //without this we would not wait for the last link of the page to be visited successfully
+                                    location.reload();
+                                //J("a[title='Refresh']")[0].click();
+                            }
                         }
                         break;
                     case "/viewwebsite.php":
