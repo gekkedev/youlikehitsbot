@@ -24,6 +24,7 @@
 Mozilla Firefox: Install [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/), [Tampermonkey](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/) or [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/).  
 Opera: Install [this](https://addons.opera.com/en/extensions/details/install-chrome-extensions/) extension first, then you can install Tampermonkey, Greasemonkey, or Violentmonkey from the Chrome extension store.
 2. Click [here](https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js) and confirm your intention to install the Userscript.
+
 3.(Optional) Bonus. add dropref.com to your /etc/hosts file as such:
 127.0.0.1 dropref.com
 
