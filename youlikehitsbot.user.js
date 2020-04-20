@@ -27,7 +27,7 @@
             window[captchaIdentifier] = true; //solving takes some time, so we'll lock a duplicate solver instance out
             let note = attachNotification(imageEl, "Please wait while your captcha is being solved. Don't worry if the code does not seem to match; that's because a new captcha image has been generated!");
             Tesseract.recognize(J(imageEl).attr("src")).then(equation => {
-                var formula = equation.text;
+                var formula = equation.data.text;
                 if (formula.length = 3) {//the exact length of the fomula
                     if (formula.substr(1, 1) == 7) { //2-1 gets recognized as 271
                         formula = formula.substr(0, 1) + "-" + formula.substr(2);
