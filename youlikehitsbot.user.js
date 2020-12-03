@@ -11,6 +11,7 @@
 // @match        *://*.youlikehits.com/viewwebsite.php*
 // @match        *://*.youlikehits.com/youtubenew2.php*
 // @match        *://*.youlikehits.com/bonuspoints.php*
+// @match        *://*.youlikehits.com/youtube2.php*
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
@@ -68,8 +69,40 @@
     let previousVideo = "";
     /** indicates if a warning/message has already been shown. Happens once per window. Use alertOnce() */
     let shownWarnings = [];
+function clickYoutubeSubscriberButton() {
+   switch (document.location.pathname) {
+    case "/youtube2.php":
+                    console.log("Youtube Subscribers")
+                    //followbutton
+      
+                    var buttons = J(".followbutton");
+                              buttons[0].onclick();
+                                        console.log("Youtube Subscribers 1")
+                      var button = J(".likebutton");
+                            if (button.length) {
+                              button[0].href();
+                              console.log("Button Clicked");
+                            }
 
+                    //likebutton
+                    break;
+  }
+};
+  function runYoutubeSubscriberWindow() {
+       var button = J(".likebutton");
+                            if (button.length) {
+                              button[0].onclick();
+                              console.log("Button Clicked");
+                            }
+    //J(".followbutton")[0].click();
+  }
+
+ 
+  setTimeout(clickYoutubeSubscriberButton, 4000);
+  setInterval(runYoutubeSubscriberWindow, 15500);
+  
     setInterval(() => {
+      
         if (J("*:contains('503 Service Unavailable')").length) {
             console.log("Server Error! reloading...");
             location.reload();
@@ -106,7 +139,7 @@
                                         patienceKiller(previousVideo)
                                     }
                                 } else {
-                                    console.log("Watching one Video!");
+                                    console.log("Watching one Video!"); 
                                     J(".followbutton")[0].click();
                                     patienceKiller(previousVideo)
                                 }
@@ -120,7 +153,8 @@
                 }
             GM.getValue("ylh_traffic_tab_open", false).then(state => {
                 switch (document.location.pathname) {
-                    case "/websites.php":
+                    
+                    case "/websites.php*":
                         if (J("*:contains('There are no Websites currently visitable for Points')").length) {
                             alertOnce("All websites were visited. Revisit/reload the page to start surfing again.")
                         } else {
@@ -158,6 +192,7 @@
                                     /*window.close(); //might not always work in FF
                                     setTimeout (window.close, 1000);*/
                                 });
+                              
                             } else if (J("*:contains('viewing websites too quickly!  Please wait')").length) location.reload();
                         } else alert("Please reload the website list, and make sure you are still logged in.");
                         break;
