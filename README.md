@@ -10,6 +10,10 @@
 * captcha solving (applicable to further sections)
 * automatic clicks on the "view" button
 
+#### YouTube Subscriber Section
+* automatic clicks on the "subscribe to _" button every 15 seconds
+* automatically subscribes in youtube and closes window
+
 #### Login Form
 * captcha solving (no further automation planned here!)
 
