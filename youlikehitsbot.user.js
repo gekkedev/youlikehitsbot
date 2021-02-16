@@ -8,6 +8,7 @@
 // @downloadURL  https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @match        *://*.youlikehits.com/login.php
 // @match        *://*.youlikehits.com/websites.php*
+// @match        *://*.youlikehits.com/youtube2.php*
 // @match        *://*.youlikehits.com/viewwebsite.php*
 // @match        *://*.youlikehits.com/youtubenew2.php*
 // @match        *://*.youlikehits.com/bonuspoints.php*
@@ -18,10 +19,6 @@
 // @require      https://cdn.jsdelivr.net/gh/naptha/tesseract.js/dist/tesseract.min.js
 // ==/UserScript==
 (() => {
-
-    //We could not verify the action. Please make sure you are Subscribed and try waiting at least 10 seconds before closing the PopUp.
-    //var elmnt1 = document.querySelector('[title="Table of Contents"]');
-
     const J = jQuery.noConflict(true);
     const globalInterval = 2000;
 
@@ -99,7 +96,6 @@
             button[0].click();
             console.log("Button Clicked");
         }
-        //J(".followbutton")[0].click();
     }
     var button = J(".likebutton");
     if (button.length) {
@@ -107,7 +103,6 @@
         console.log("Button Clicked");
     }
 
-    //YouTube Limit
     clickYoutubeSubscriberButton();
     var count = 12.5;
 
@@ -183,25 +178,28 @@
             switch (document.location.pathname) {
                 case "/youtube2.php":
 
+                    // Check if there are any alerts/errors
                     if (J("*:contains('Subscriber Limit Reached')").length) location.reload();
                     if (J("*:contains('YouTube Limit')").length) location.reload();
                     if (J("*:contains('We could not verify the action. Please make sure you are Subscribed and try waiting at least 10 seconds before closing the PopUp.')").length) location.reload();
                     if (J("*:contains('This YouTube account no longer exists.')").length) location.reload();
                     if (J("*:contains('Something is wrong with the account you\'re trying to subscribe to.')").length) location.reload();
                     if (J("*:contains('You took longer than 90 seconds to finish Subscribing to the account and confirming it.')").length) location.reload();
-                    //                      if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('Subscriber Limit Reached') > -1) {
-                    //             location.reload(true);
-                    // } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('YouTube Limit') > -1) {
-                    //                    location.reload(true);
-                    // } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('We could not verify the action. Please make sure you are Subscribed and try waiting at least 10 seconds before closing the PopUp.') > -1) {
-                    //                    location.reload(true);
-                    // } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('You took longer than 90 seconds to finish Subscribing to the account and confirming it.') >-1) {
-                    //                    location.reload(true);
-                    // } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('Something is wrong with the account you\'re trying to subscribe to.') > -1) {
-                    //                    location.reload(true);
-                    // } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('This YouTube account no longer exists.') > -1) {
-                    //                    location.reload(true);
-                    // }
+
+                    // Check for alerts/errors without JQuery
+                    if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('Subscriber Limit Reached') > -1) {
+                        location.reload(true);
+                    } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('YouTube Limit') > -1) {
+                        location.reload(true);
+                    } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('We could not verify the action. Please make sure you are Subscribed and try waiting at least 10 seconds before closing the PopUp.') > -1) {
+                        location.reload(true);
+                    } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('You took longer than 90 seconds to finish Subscribing to the account and confirming it.') > -1) {
+                        location.reload(true);
+                    } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('Something is wrong with the account you\'re trying to subscribe to.') > -1) {
+                        location.reload(true);
+                    } else if ((document.documentElement.textContent || document.documentElement.innerText).indexOf('This YouTube account no longer exists.') > -1) {
+                        location.reload(true);
+                    }
 
                     break;
                 case "/login.php":
