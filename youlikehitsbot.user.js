@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         YouLikeHits Youtube Bot
+// @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
 // @version      0.4.1
-// @description  Get YouLikeHits Points by doing nothing
-// @author       Ashwin Paudel
+// @description  Interacts with YLH automatically whereever possible.
+// @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @downloadURL  https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @match        *://*.youlikehits.com/login.php
@@ -11,8 +11,6 @@
 // @match        *://*.youlikehits.com/viewwebsite.php*
 // @match        *://*.youlikehits.com/youtubenew2.php*
 // @match        *://*.youlikehits.com/bonuspoints.php*
-// @match        *://*.youlikehits.com/youtube2.php*
-// @match        https://www.youtube.com/channel/*
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
