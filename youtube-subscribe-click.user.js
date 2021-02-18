@@ -10,8 +10,15 @@
 
 (function() {
     'use strict';
-    // Click the subscribe button
-    document.getElementsByClassName("style-scope ytd-button-renderer style-destructive size-default")[0].click();
-    // Then close the window
+
+    // Your code here...
+    try
+    {
+        var btnelem=document.getElementsByClassName('style-scope ytd-subscribe-button-renderer')[0];
+        var subscribed = (btnelem.innerText.search("UNSUB")==-1)?false:true;
+    }catch(Exception){window.close()}
+    if(!subscribed){
+        document.getElementsByClassName('style-scope ytd-subscribe-button-renderer')[0].click();
+    }
     window.close();
 })();
