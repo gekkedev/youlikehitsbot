@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
-// @version      0.4.1
+// @version      0.4.2
 // @description  Interacts with YLH automatically whereever possible.
 // @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
@@ -15,7 +15,7 @@
 // @grant        GM.setValue
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
 // @require      https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
-// @require      https://cdn.jsdelivr.net/gh/naptha/tesseract.js/dist/tesseract.min.js
+// @require      https://cdn.jsdelivr.net/npm/tesseract.js@2.0.0/dist/tesseract.min.js
 // ==/UserScript==
 
 (() => {
@@ -27,8 +27,8 @@
             window[captchaIdentifier] = true; //solving takes some time, so we'll lock a duplicate solver instance out
             let note = attachNotification(imageEl, "Please wait while your captcha is being solved. Don't worry if the code does not seem to match; that's because a new captcha image has been generated!");
             Tesseract.recognize(J(imageEl).attr("src")).then(equation => {
-                var formula = equation.text;
-                if (formula.length = 3) {//the exact length of the fomula
+                var formula = equation.text;console.log(equation);
+                if (formula.length == 3) { //the exact length of the fomula
                     if (formula.substr(1, 1) == 7) { //2-1 gets recognized as 271
                         formula = formula.substr(0, 1) + "-" + formula.substr(2);
                     }
