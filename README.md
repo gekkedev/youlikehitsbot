@@ -10,6 +10,9 @@
 * captcha solving (applicable to further sections)
 * automatic clicks on the "view" button
 
+#### SoundCloud Play Section
+* automatic clicks on the "view" button
+
 #### Login Form
 * captcha solving (no further automation planned here!)
 
@@ -35,6 +38,8 @@ Before/while solving:
   
 After solving:  
 ![](images/captcha2.png)
+
+**Note:** It apears that YLH has currently disabled captchas or is not presenting them to everyone. Nevertheless, if they reappear, the bot can handle them.
 
 ## Features to come in future
 * coverage of more sections

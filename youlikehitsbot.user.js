@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
-// @version      0.4.1
+// @version      0.5.0
 // @description  Interacts with YLH automatically whereever possible.
 // @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @downloadURL  https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @match        *://*.youlikehits.com/login.php
+// @match        *://*.youlikehits.com/soundcloudplays.php*
 // @match        *://*.youlikehits.com/websites.php*
 // @match        *://*.youlikehits.com/viewwebsite.php*
 // @match        *://*.youlikehits.com/youtubenew2.php*
@@ -20,6 +21,7 @@
 
 (() => {
     const J = jQuery.noConflict(true);
+    /** how many miliseconds to wait between launching another loop */
     const globalInterval = 2000;
 
     solveCaptcha = (imageEl, outputEl, captchaIdentifier, callback = () => {}) => {
@@ -44,19 +46,25 @@
         }
     }
 
-    attachNotification = (identifier, notification) => {
-        el = "<p style='color: red;'>" + notification + "</p>";
-        prevEl = J(identifier).prev()[0];
-        if (prevEl == undefined || prevEl.innerText != notification)
+    const attachNotification = (identifier, notification) => {
+        //IDEA: turn it into a nice(r) GUI with an ID to check more efficiently for duplicates
+        const el = "<p style='color: red;'>Bot says: <i>" + notification + "</i></p>";
+        const prevEl = J(identifier).prev()[0];
+        if (prevEl == undefined || !prevEl.innerText.includes(notification))
            return J(el).insertBefore(identifier);
     }
 
-    removeNotification = (el) => {
+    const removeNotification = (el) => {
         if (el != undefined)
             el.remove()
     }
 
-    alertOnce = (message, identifier) => {
+    /** input seconds, receive milliseconds */
+    const randomSeconds = (from, to) => {
+        return Math.floor(Math.random() * (to - from + 1) + from) * 1000
+    }
+
+    const alertOnce = (message, identifier) => {
         localIdentifier = (identifier != undefined) ? identifier : message;
         if (shownWarnings.indexOf(localIdentifier) == -1) {
             shownWarnings.push(localIdentifier);
@@ -69,7 +77,8 @@
     /** indicates if a warning/message has already been shown. Happens once per window. Use alertOnce() */
     let shownWarnings = [];
 
-    setInterval(() => {
+    //loop over the website to find out which subpage we are on and take the appropriate actions IDEA: refactor the loop into a singleton
+    const mainLoop = setInterval(() => {
         if (J("*:contains('503 Service Unavailable')").length) {
             console.log("Server Error! reloading...");
             location.reload();
@@ -81,16 +90,24 @@
                 switch (document.location.pathname) {
                     case "/login.php":
                         if (!J("#password").val().length) attachNotification("#username", "Consider storing your login data in your browser.")
-                        captcha = J("img[alt='Enter The Numbers']");
+                        const captcha = J("img[alt='Enter The Numbers']");
                         if (captcha.length)
                             solveCaptcha(captcha[0], J("input[name='postcaptcha']"), "ylh_login_captchasolving");
                         break;
                     case "/bonuspoints.php":
                         if (J("body:contains('You have made ')").length && J("body:contains(' Hits out of ')").length) {
-                            attachNotification(".maintable", "Not enough points. Reloading the website in 2 minutes to check again...");
-                            setTimeout(() => location.reload(), 1000 * 120);
+                            const reloadDelay = randomSeconds(60, 60 * 5);
+                            attachNotification(".maintable", "Not enough points. Reloading the website in " + Math.round(reloadDelay / 1000 / 60) + " minutes to check again...");
+                            setTimeout(() => location.reload(), reloadDelay);
+                            clearInterval(mainLoop); //no further checks since we gotta reload anyway
                         } else if (J(".buybutton").length) J(".buybutton")[0].click()
                         break;
+                    case "/soundcloudplays.php":
+                         //no timer visible / no song currently playing?
+                        if (!J(".maintable span[id*='count']").attr("style").includes("display:none;")) return attachNotification(".maintable", "Music already playing..."); //TODO: detect timers that do not update
+                        if (J(".followbutton").length) {
+                            J(".followbutton").first().click();
+                        } else alert("no followbutton, fix this pls");
                     case "/youtubenew2.php":
                         if (J('body:contains("failed")').length) location.reload(); //captcha failed?
                         if (J(".followbutton").length) { //if false, there is likely a captcha waiting to be solved
