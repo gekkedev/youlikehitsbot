@@ -2,9 +2,15 @@
 ## Features
 **Just navigate to each of these sections (with one dedicated browser tab each) in order to launch the bot.**
 #### Website Section
-* automatic clicks on links
-* closing of opened tabs if their points were successfully awarded
-* automatic reloading in various cases e.g. all links were clicked, internal server error, link ran out of points etc.
+* automatic clicks on website view links
+* closing of opened tabs if
+  * their points were successfully awarded
+  * you reported them (within YLH)
+  * the campaign ran out of points
+* reloading of tabs when throttled for being too fast
+* automatic reloading of the overview page in various cases e.g.
+  * all links were clicked
+  * internal server error
 
 #### YouTube View Section
 * captcha solving (applicable to further sections)

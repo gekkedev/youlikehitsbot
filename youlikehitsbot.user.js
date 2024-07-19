@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouLikeHits Bot
 // @namespace    https://github.com/gekkedev/youlikehitsbot
-// @version      0.5.0
+// @version      0.5.1
 // @description  Interacts with YLH automatically whereever possible.
 // @author       gekkedev
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
@@ -169,13 +169,17 @@
                         break;
                     case "/viewwebsite.php":
                         if (!J("*:contains('been logged out of YouLikeHits')").length) {
-                            if (J(".alert:visible:contains('You got'):contains('Points')").length || J('body:contains("We couldn\'t locate the website you\'re attempting to visit.")').length) {
+                            if (
+                              J(".alert:visible:contains('You got'):contains('Points')").length
+                              || J('body:contains("We couldn\'t locate the website you\'re attempting to visit.")').length
+                              || J('body:contains("You have successfully reported")').length
+                            ) {
                                 console.log("setting the tabstate to false...");
                                 GM.setValue('ylh_traffic_tab_open', false).then(() => { //free the way for a new tab
                                     /*window.close(); //might not always work in FF
                                     setTimeout (window.close, 1000);*/
                                 });
-                            } else if (J("*:contains('viewing websites too quickly!  Please wait')").length) location.reload();
+                            } else if (J("*:contains('viewing websites too quickly! Please wait')").length) location.reload();
                         } else alert("Please reload the website list, and make sure you are still logged in.");
                         break;
                 }
