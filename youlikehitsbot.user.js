@@ -3,7 +3,7 @@
 // @namespace    https://github.com/gekkedev/youlikehitsbot
 // @version      0.5.1
 // @description  Interacts with YLH automatically whereever possible.
-// @author       gekkedev
+// @author       gekkedev & Xnuvers007
 // @updateURL    https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @downloadURL  https://raw.githubusercontent.com/gekkedev/youlikehitsbot/master/youlikehitsbot.user.js
 // @match        *://*.youlikehits.com/login.php
@@ -109,29 +109,69 @@
                             J(".followbutton").first().click();
                         } else alert("no followbutton, fix this pls");
                     case "/youtubenew2.php":
+                        if (J("#listall:contains('There are no videos available to view at this time')").length) {
+                            console.log("No videos available. Reloading page...");
+                            setTimeout(() => location.reload(), 3000); // refresh setelah 3 detik
+                            return;
+                        }
                         if (J('body:contains("failed")').length) location.reload(); //captcha failed?
-                        if (J(".followbutton").length) { //if false, there is likely a captcha waiting to be solved
-                            let vidID = () => { return J(".followbutton").first().parent().children("span[id*='count']").attr("id") };
-                            let patienceKiller = (prev) => { setTimeout( () => { if (vidID() == prev) { J(".followbutton").parent().children("a:contains('Skip')").click(); newWin.close(); }}, 1000 * 135)}; //max time: 120s + 15s grace time (max length: http://prntscr.com/q4o75o)
-                            //console.log(previousVideo + " " + vidID() + (previousVideo != vidID() ? " true": " false"));
-                            if (vidID() != previousVideo) { //has a new video has been provided yet? This will overcome slow network connections causing the same video to be played over and over
+                        if (J(".followbutton").length) { // if false, there is likely a captcha waiting to be solved
+                            let vidID = () => {
+                                return J(".followbutton").first().parent().children("span[id*='count']").attr("id");
+                            };
+
+                            // get value points (from parent().html())
+                            let pointsLine = J(".followbutton").parent().html();
+                            let pointsMatch = pointsLine.match(/Points<\/b>:\s*(\d+)/);
+                            let points = pointsMatch ? parseInt(pointsMatch[1]) : 0;
+
+                            let patienceKiller = (prev) => {
+                                setTimeout(() => {
+                                    if (vidID() == prev) {
+                                        J(".followbutton").parent().children("a:contains('Skip')").click();
+                                        if (typeof(newWin) !== "undefined") newWin.close();
+                                    }
+                                }, 1000 * 230); // max time: 120s + 15s grace time -> change become 230 because when get timer 203 it will skip :) logic error
+                            };
+
+                            if (vidID() != previousVideo) { // has a new video been provided?
                                 previousVideo = vidID();
-                                if (window.eval("typeof(window.newWin) !== 'undefined'")) {
+                                if (typeof(window.newWin) !== 'undefined') {
                                     if (newWin.closed) {
-                                        console.log("Watching one Video!");
-                                        J(".followbutton")[0].click();
-                                        patienceKiller(previousVideo)
+                                        console.log("Checking Points...");
+                                        if (points > 5) { // in this, you can edit point what you want to get (minimal, default > 5 point view, if < 5 point skip
+                                            console.log("Points = " + points + " > 5. Viewing video.");
+                                            J(".followbutton")[0].click();
+                                        } else {
+                                            console.log("Points = " + points + " <= 5. Skipping video.");
+                                            J(".followbutton").parent().children("a:contains('Skip')").click();
+                                        }
+                                        patienceKiller(previousVideo);
                                     }
                                 } else {
-                                    console.log("Watching one Video!");
-                                    J(".followbutton")[0].click();
-                                    patienceKiller(previousVideo)
+                                    console.log("Checking Points...");
+                                    if (points > 5) {
+                                        console.log("Points = " + points + " > 5. Viewing video.");
+                                        J(".followbutton")[0].click();
+                                    } else {
+                                        console.log("Points = " + points + " <= 5. Skipping video.");
+                                        J(".followbutton").parent().children("a:contains('Skip')").click();
+                                    }
+                                    patienceKiller(previousVideo);
                                 }
-                            } //else do nothing and wait (until the video gets replaced or our patience thread tears)
+                            }
+                            // else do nothing and wait (until the video gets replaced or patience thread tears)
                         } else {
                             captcha = J("img[src*='captchayt']");
-                            if (captcha.length) //captcha? no problemo, amigo.
-                                solveCaptcha(captcha[0], J("input[name='answer']"), "ylh_yt_traffic_captchasolving", () => J("input[value='Submit']").first().click());
+                            if (captcha.length) {
+                                // captcha? no problemo, amigo.
+                                solveCaptcha(
+                                    captcha[0],
+                                    J("input[name='answer']"),
+                                    "ylh_yt_traffic_captchasolving",
+                                    () => J("input[value='Submit']").first().click()
+                                );
+                            }
                         }
                         break;
                 }
